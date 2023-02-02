@@ -1,1 +1,49 @@
+1
+df.groupby(['year' , 'month']).count()['url'].idxmax()
+2
+df["day"] = [d.day for d in df.published]
+f = df[df['domain']=='geektimes.ru'].groupby(['dayofweek']).count()['url'].plot()
+f = df[df['domain']=='habrahabr.ru'].groupby(['dayofweek']).count()['url'].plot()
+f = df.groupby(['dayofweek']).count()['url'].plot(color='black')
+f.legend(labels = ['geektimes.ru', 'habrahabr.ru','all'])
+3
+dfaftergroupby = df.groupby(['hour']).sum()
+#Вопрос 1: Больше всего просмотров набирают статьи, опубликованные в 12 часов дня
+print('Answer 1 =',dfaftergroupby['views'].idxmax())
+#result = 12, ответ верный.
 
+#Вопрос 2: У опубликованных в 10 утра постов больше всего комментариев?
+print('Answer 2 =',dfaftergroupby['comments'].idxmax())
+#result = 13, ответ неверный.
+
+#Вопрос 3: Больше всего просмотров набирают статьи, опубликованные в 6 часов утра?
+print('Answer 3 =',dfaftergroupby['views'].idxmax())
+#result = 12, ответ неверный.
+
+#Вопрос 4: Максимальное число комментариев на гиктаймсе набрала статья, опубликованная в 9 часов вечера?
+print('Answer 4 =',df[df['domain'] == 'geektimes.ru'].groupby(['hour']).sum()['comments'].idxmax())
+#result = 12, ответ неверный.
+
+#Вопрос 5: На хабре дневные статьи комментируют чаще, чем вечерние
+if (dfaftergroupby['comments'][12:17].sum() > dfaftergroupby['comments'][17:24].sum()): 
+    print('дневные')
+else: 
+    print('вечерние')
+#result = дневные, ответ верный.
+4
+df.groupby(['author']).sum()['votes_minus'].idxmax()
+5
+pd.options.mode.chained_assignment = None
+df['isday'] = df.hour
+ittertools = 0 
+for i in df['hour']:
+    if i in range(18,24):
+        df['isday'][ittertools] = 2
+    elif i in range(12,18):
+        df['isday'][ittertools] = 1
+    else: 
+        df['isday'].iloc[ittertools] = 0
+    ittertools+=1
+df.groupby(['dayofweek' , 'isday']).count()['url'] 
+#Правда ли, что по субботам авторы пишут в основном днём, а по понедельникам — в основном вечером?
+#Ответ: Нет
